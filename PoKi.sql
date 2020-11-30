@@ -33,9 +33,8 @@
 --FROM Poem;
 
 --8.Which poem has the fewest characters?
---SELECT CharCount, Text
---FROM Poem
---WHERE CharCount = (SELECT Min(CharCount) from Poem);
+--SELECT TOP 1 Title FROM Poem
+--ORDER BY CharCount DESC
 
 --9.How many authors are in the third grade?
 --SELECT COUNT (Grade.Name)
@@ -44,26 +43,26 @@
 --WHERE Grade.Name = '3rd Grade';
 
 --10.How many authors are in the first, second or third grades?
---SELECT COUNT (Grade.Name)
+--SELECT COUNT (*) AS AuthorCount, Grade.Name
 --From Author
 --LEFT JOIN Grade on Author.GradeId = Grade.Id
---WHERE Grade.Name = '1st Grade' OR Grade.Name = '2nd Grade' OR Grade.Name = '3rd Grade';
+--WHERE Grade.Name IN ('1st Grade', '2nd Grade','3rd Grade')
+--Group By Grade.Name;
 
 --11.What is the total number of poems written by fourth graders?
---SELECT COUNT (Poem.Title) AS Title, Grade.Name
---FROM Author
---LEFT JOIN Poem on Poem.AuthorId = Author.Id
---LEFT JOIN Grade on Author.GenderId = Grade.Id
+--SELECT COUNT(poem.Id) as FourthGradePoemCount
+--FROM Author 
+--left JOIN Grade  ON Author.GradeId = Grade.Id
+--left JOIN Poem ON Poem.AuthorId = Author.Id
 --WHERE Grade.Name = '4th Grade'
---GROUP BY Grade.Name;
 
 --12.How many poems are there per grade?
---select count (Poem.Title) as title, grade.Name
---from Poem
---left join Author on poem.authorid = author.id
---left join grade on author.GradeId = grade.id
---group by grade.Name
---order by grade.Name asc;
+--select count (poem.title) as title, grade.name
+--from poem
+--left join author on poem.authorid = author.id
+--left join grade on author.gradeid = grade.id
+--group by grade.name
+--order by grade.name asc;
 
 --13.How many authors are in each grade? (Order your results by grade starting with 1st Grade)
 --SELECT COUNT (Author.Name) AS TotalNumber, Grade.Name AS Grade
@@ -73,9 +72,9 @@
 --Order BY Grade.Name
 
 --14.What is the title of the poem that has the most words?
---SELECT WordCount, Title
+--SELECT TOP 1 Title
 --FROM Poem
---WHERE WordCount = (SELECT MAX (WordCount) from Poem);
+--ORDER BY WordCount
 
 --15.Which author(s) have the most poems? (Remember authors can have the same name.)
 --SELECT TOP 1 COUNT (Poem.Id) AS NumOfPoem, Author.Name, Author.Id
@@ -92,10 +91,10 @@
 --WHERE Emotion.Name = 'Sadness';
 
 --17.How many poems are not associated with any emotion?
---SELECT COUNT (Poem.Title) AS NumOfPoemWithoutEmotion
---FROM Poem
---LEFT JOIN PoemEmotion on PoemEmotion.PoemId = Poem.Id
---WHERE PoemEmotion.PoemId IS NULL;
+--select count (poem.title) as numofpoemwithoutemotion
+--from poem
+--left join poememotion on poememotion.poemid = poem.id
+--where poememotion.poemid is NULL;
 
 --18.Which emotion is associated with the least number of poems?
 --SELECT TOP 1 COUNT (Emotion.Name), Emotion.Name
@@ -106,13 +105,26 @@
 --ORDER BY COUNT (Emotion.Name);
 
 --19.Which grade has the largest number of poems with an emotion of joy?
---PoemEmotion Table
---4 joins
-
-
+SELECT TOP 1 Grade.Name 
+FROM Poem 
+JOIN PoemEmotion  ON PoemEmotion.PoemId = Poem.Id
+JOIN Emotion ON PoemEmotion.EmotionId = Emotion.Id
+JOIN Author ON Poem.AuthorId = Author.Id
+JOIN Grade  ON Author.GradeId = Grade.Id
+WHERE Emotion.Name = 'Joy'
+GROUP BY Grade.Name
+ORDER BY COUNT(Poem.Id) DESC
 
 --20.Which gender has the least number of poems with an emotion of fear?
-
+SELECT TOP 1 Grade.Name
+FROM Poem 
+JOIN PoemEmotion ON PoemEmotion.PoemId = Poem.Id
+JOIN Emotion  ON PoemEmotion.EmotionId = Emotion.Id
+JOIN Author  ON Poem.AuthorId = Author.Id
+JOIN Gender  ON Author.GenderId = Grade.Id
+WHERE Emotion.Name = 'Fear'
+GROUP BY Grade.Name
+ORDER BY COUNT(Poem.Id) ASC
 
 
 
